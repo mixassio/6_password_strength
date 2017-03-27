@@ -1,5 +1,11 @@
+import argparse
 import re
 
+def create_parser ():
+    parser = argparse.ArgumentParser()
+    parser.add_argument ('password')
+    parser.add_argument ('-v', '--valuation', action='store_const', const=True)
+    return parser
 
 def get_password_strength(password):
     status_pasw = 1
@@ -52,7 +58,7 @@ def get_password_strength(password):
     if re.findall('(\d+)', password) != []:
         status_pasw += 1
         list_success.append('number+1')
-    #check %^&*
+    #check punctuation
     if re.findall('[^\w\s]', password) != []:
         status_pasw += 1
         list_success.append('punctuation+1')
@@ -74,12 +80,17 @@ def get_password_strength(password):
         if password.find(str(pasw)) > 0:
             status_pasw -= 1
             list_success.append('parts popular pasword-1')
-            print(pasw)
             break
-    print(list_success)
-    return status_pasw
+    return status_pasw, list_success
 
 
 
 if __name__ == '__main__':
-    print(get_password_strength('hj195UIshadow%erty'))
+    parser = create_parser()
+    namespace = parser.parse_args()
+
+    status_pasw, list_success = get_password_strength(namespace.password)
+    print('Password complexity (1 - 10) : {}'.format(status_pasw))
+    if namespace.valuation:
+        for valuation in list_success:
+            print(valuation)
