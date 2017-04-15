@@ -44,30 +44,6 @@ def get_password_strength(password):
     else:
         status_pasw += 1
         list_success.append('not in list+1')
-    #check character
-    if re.findall('([a-zA-Z])', password) != []:
-        status_pasw += 1
-        list_success.append('character+1')
-    #check on upper and lower case
-    is_upp = set()
-    is_low = set()
-    for letter in password:
-        is_low.add(letter.islower())
-        is_upp.add(letter.isupper())
-    if True in is_low and True in is_upp:
-        status_pasw += 2
-        list_success.append('lower+upper+2')
-    #check number
-    if re.findall('(\d+)', password) != []:
-        status_pasw += 1
-        list_success.append('number+1')
-    #check punctuation
-    if re.findall('[^\w\s]', password) != []:
-        status_pasw += 1
-        list_success.append('punctuation+1')
-    if len(password) > 6:
-        status_pasw += 1
-        list_success.append('lenght+1')
     #check include year
     status_pasw += 1
     list_success.append('not year+1')
@@ -76,6 +52,16 @@ def get_password_strength(password):
             status_pasw -= 1
             list_success.append('year-1')
             break
+    # Checking characters, upper, lower, len, punctuations
+    if len(password) >= 6 and bool(re.match("^.*[A-Z]+.*$", password) and
+             re.match("^.*[a-z]+.*$", password) and
+             re.match("^.*[0-9]+.*$", password) and
+             re.match("^.*[\w\s]+.*$", password)):
+        status_pasw += 5
+        list_success.append('lower+upper+2')
+        list_success.append('punctuation+1')
+        list_success.append('lenght+1')
+        list_success.append('character+1')
     # Checking the parts of popular passwords
     status_pasw += 1
     list_success.append('not parts popular pasword+1')
