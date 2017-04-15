@@ -44,21 +44,13 @@ def get_password_strength(password):
     else:
         status_pasw += 1
         list_success.append('not in list+1')
-    #check include year
-    status_pasw += 1
-    list_success.append('not year+1')
-    for year in range(1950,2017):
-        if password.find(str(year)) > 0:
-            status_pasw -= 1
-            list_success.append('year-1')
-            break
     # Checking characters, upper, lower, len, punctuations
     if len(password) >= 6 and bool(re.match("^.*[A-Z]+.*$", password) and
              re.match("^.*[a-z]+.*$", password) and
              re.match("^.*[0-9]+.*$", password) and
              re.match("^.*[\w\s]+.*$", password)):
-        status_pasw += 5
-        list_success.append('lower+upper+2')
+        status_pasw += 6
+        list_success.append('lower+upper+3')
         list_success.append('punctuation+1')
         list_success.append('lenght+1')
         list_success.append('character+1')
