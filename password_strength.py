@@ -2,15 +2,8 @@ import argparse
 import re
 import getpass
 
-def create_parser ():
-    parser = argparse.ArgumentParser()
-    #parser.add_argument ('password')
-    parser.add_argument ('-v', '--valuation', action='store_const', const=True)
-    return parser
-
-
 def get_user_password():
-    print('enter password')
+    print('Enter password:')
     password = getpass.getpass()
     return password
 
@@ -56,12 +49,12 @@ def check_char(password):
     #check punctuation
     if re.findall('[^\w\s]', password) != []:
         status_pasw += 1
-        list_success.append('punctuation+1')
+        list_success.append('punctuation +1')
     return status_pasw, list_success
 
 def check_len(password):
     if len(password) >= 6:
-        return 1, ['lenght+1'] 
+        return 1, ['lenght +1'] 
     else:
         return 0, []
 
@@ -71,7 +64,7 @@ def check_year(password):
     for year in range(1950,2017):
         if password.find(str(year)) > 0:
             status_pasw -= 1
-            list_success.append('year-1')
+            list_success.append('year -1')
             break
     return status_pasw, list_success
 
@@ -80,17 +73,12 @@ def get_password_strength(password):
     list_success = []
     a, b = map(lambda a, b, c, d: a + b + c + d, check_blacklist(password), check_char(password), check_len(password), check_year(password))
     print(a, b)
+    print('Password complexity (1 - 10) : {}'.format(a))
+    for i in b:
+        print(i)
 
 
 
 if __name__ == '__main__':
-    parser = create_parser()
-    namespace = parser.parse_args()
     password = get_user_password()
     get_password_strength(password)
-    """
-    status_pasw, list_success = get_password_strength(namespace.password)
-    print('Password complexity (1 - 10) : {}'.format(status_pasw))
-    if namespace.valuation:
-        for valuation in list_success:
-            print(valuation)"""
