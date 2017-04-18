@@ -69,13 +69,11 @@ def check_year(password):
     return status_pasw, list_success
 
 def get_password_strength(password):
-    status_pasw = 0
-    list_success = []
-    a, b = map(lambda a, b, c, d: a + b + c + d, check_blacklist(password), check_char(password), check_len(password), check_year(password))
-    print(a, b)
-    print('Password complexity (1 - 10) : {}'.format(a))
-    for i in b:
-        print(i)
+    status_sum, list_sum = map(lambda a, b, c, d: a + b + c + d, check_blacklist(password), check_char(password), check_len(password), check_year(password))
+    print('Password complexity (1 - 10) : {}'.format(status_sum))
+    print('---------------------------------')
+    for deposit in list_sum:
+        print(deposit)
 
 
 
