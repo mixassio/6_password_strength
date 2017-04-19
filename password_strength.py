@@ -3,8 +3,7 @@ import re
 import getpass
 
 def get_user_password():
-    print('Enter password:')
-    password = getpass.getpass()
+    password = getpass.getpass(prompt='Enter password: ')
     return password
 
 def check_blacklist(password):
