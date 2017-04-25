@@ -2,84 +2,95 @@ import re
 import getpass
 import requests
 
+rating = {'check_blacklist': {'status': False, 'weigth': 2, 'text': 'Not in black list +2'},
+          'check_character': {'status': False, 'weigth': 1, 'text': 'character+1'},
+          'check_upper_lower': {'status': False, 'weigth': 2, 'text': 'lower+upper+2'},
+          'check_number': {'status': False, 'weigth': 1, 'text': 'number+1'},
+          'check_punctuation': {'status': False, 'weigth': 1, 'text': 'punctuation +1'},
+          'check_len': {'status': False, 'weigth': 1, 'text': 'lenght +1'},
+          'check_year': {'status': False, 'weigth': -1, 'text': 'year -1'}}
+
 def get_user_password():
     password = getpass.getpass(prompt='Enter password: ')
     return password
 
-def check_blacklist(password):
-    rating = 0
-    list_rating = []
-    # я создал блэк лист из 15000 паролей в гугл-доксе
+
+def password_black_list():
     url_blacklist = 'https://docs.google.com/spreadsheets/d/1B3t1Oi8E5vD311Wog8BCZXao92rPfOaNZ3DFvTcuL9M/pub?output=csv'
     black_list = requests.get(url_blacklist)
-    for black_password in black_list.text.split('\r\n'):
+    return black_list.text.split('\r\n')
+
+
+def check_blacklist(password):
+    black_list = password_black_list()
+    for black_password in black_list:
         if black_password == password:
-            list_rating += ['Very bad password']
             break
     else:
-        rating += 2
-        list_rating += ['Not in black list +2',]
-    #check part popular password
-    for black_password in black_list.text.split('\r\n'):
-        if password.find(str(black_password)) > 0:
-            rating -= 1
-            list_rating += ['parts popular pasword -1']
-            break
-    return rating, list_rating
+        rating['check_blacklist']['status'] = True
 
-def check_char(password):
-    rating = 0
-    list_success = []
-    #check character
-    if re.findall('([a-zA-Z])', password) != []:
-        rating += 1
-        list_success.append('character+1')
-    #check on upper and lower case
-    is_upp = set()
-    is_low = set()
+def check_character(password):
+    if re.findall('([a-zA-Z])', password):
+        rating['check_character']['status'] = True
+
+
+def check_upper_lower(password):
+    is_upp = False
+    is_low = False
     for letter in password:
-        is_low.add(letter.islower())
-        is_upp.add(letter.isupper())
-    if True in is_low and True in is_upp:
-        rating += 2
-        list_success.append('lower+upper+2')
-    #check number
-    if re.findall('(\d+)', password) != []:
-        rating += 1
-        list_success.append('number+1')
-    #check punctuation
-    if re.findall('[^\w\s]', password) != []:
-        rating += 1
-        list_success.append('punctuation +1')
-    return rating, list_success
+        if letter.islower() and not is_low: 
+            is_low = True
+        elif letter.isupper()and not is_upp: 
+            is_upp = True
+        if is_upp and is_low: 
+            rating['check_upper_lower']['status'] = True
+            break;
+
+
+def check_number(password):
+    if re.findall('(\d+)', password):
+        rating['check_number']['status'] = True
+
+
+def check_punctuation(password):
+    if re.findall('[^\w\s]', password):
+        rating['check_punctuation']['status'] = True
+
 
 def check_len(password):
     if len(password) >= 6:
-        return 1, ['lenght +1'] 
-    else:
-        return 0, []
+        rating['check_len']['status'] = True
+        
 
-def check_year(password):
-    rating = 1
-    list_success = []   
+def check_year(password): 
     for year in range(1950,2017):
-        if password.find(str(year)) > 0:
-            rating -= 1
-            list_success.append('year -1')
+        if str(year) in password:
+            rating['check_year']['status'] = True
             break
-    return rating, list_success
+
 
 def get_password_strength(password):
-    rating_sum, list_sum = map(lambda check_blacklist, check_char, check_len, check_year:
-                               check_blacklist + check_char + check_len + check_year,
-                               check_blacklist(password), check_char(password), check_len(password), check_year(password))
-    print('Password complexity (1 - 10) : {}'.format(rating_sum))
-    print('---------------------------------')
-    for deposit in list_sum:
-        print(deposit)
+    check_blacklist(password)
+    check_character(password)
+    check_upper_lower(password)
+    check_number(password)
+    check_punctuation(password)
+    check_len(password)
+    check_year(password)
 
+    rating_sum = 0
+    list_sum = []
+    for check, value in rating.items():
+        if value['status']:
+            rating_sum += value['weigth']
+            list_sum.append(value['text'])
+    return rating_sum, list_sum
 
 
 if __name__ == '__main__':
     password = get_user_password()
-    get_password_strength(password)
+    rating_sum, list_sum = get_password_strength(password)
+    print('Password complexity (1 - 10) : {}'.format(rating_sum))
+    print('---------------------------------')
+    for deposit in list_sum:
+        print(deposit)
