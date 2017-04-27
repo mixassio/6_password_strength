@@ -4,8 +4,7 @@ import requests
 
 
 def get_user_password():
-    password = getpass.getpass(prompt='Enter password: ')
-    return password
+    return getpass.getpass(prompt='Enter password: ')
 
 
 def download_password_black_list():
@@ -23,8 +22,7 @@ def check_blacklist(password):
         return True
 
 def check_character(password):
-    if re.findall('([a-zA-Z])', password):
-        return True
+    return bool(re.findall('([a-zA-Z])', password))
 
 
 def check_upper_lower(password):
@@ -40,18 +38,15 @@ def check_upper_lower(password):
 
 
 def check_number(password):
-    if re.findall('(\d+)', password):
-        return True
+    return bool(re.findall('(\d+)', password))
 
 
 def check_punctuation(password):
-    if re.findall('[^\w\s]', password):
-        return True
+    return bool(re.findall('[^\w\s]', password))
 
 
 def check_len(password):
-    if len(password) >= 6:
-        return True
+    return bool(len(password) >= 6)
         
 
 def check_year(password): 
@@ -61,7 +56,7 @@ def check_year(password):
 
 
 def get_password_strength(password):
-    rating_sum = 0
+    rating_sum = 1
     list_sum = []
     rating = {'check_blacklist': {'status': check_blacklist(password), 'weigth': 2, 'text': 'Not in black list +2'},
               'check_character': {'status': check_character(password), 'weigth': 1, 'text': 'character+1'},
